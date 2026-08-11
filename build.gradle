@@ -16,8 +16,9 @@ repositories {
 def runeLiteVersion = 'latest.release'
 def pluginMainClass = 'com.kcjg94.easycgplugin.GauntletHighlighterPluginTest'
 
+def lwjglVersion = '3.3.2'
+
 dependencies {
-	// Exclude LWJGL natives from the client dependency
 	compileOnly(group: 'net.runelite', name: 'client', version: runeLiteVersion) {
 		exclude group: 'org.lwjgl'
 	}
@@ -30,6 +31,16 @@ dependencies {
 		exclude group: 'org.lwjgl'
 	}
 	testImplementation group: 'net.runelite', name: 'jshell', version: runeLiteVersion
+
+	// The published net.runelite:client artifact transitively requests LWJGL
+	// natives for every platform it ships for, including classifiers (e.g.
+	// linux-arm64) that aren't resolvable from Maven Central for this LWJGL
+	// version. Excluded above and re-added here scoped to Windows only.
+	testImplementation "org.lwjgl:lwjgl:$lwjglVersion"
+	testImplementation "org.lwjgl:lwjgl-opengl:$lwjglVersion"
+	testImplementation "org.lwjgl:lwjgl-opencl:$lwjglVersion"
+	testRuntimeOnly "org.lwjgl:lwjgl:$lwjglVersion:natives-windows"
+	testRuntimeOnly "org.lwjgl:lwjgl-opengl:$lwjglVersion:natives-windows"
 }
 
 group = 'com.kcjg94.easycgplugin'
